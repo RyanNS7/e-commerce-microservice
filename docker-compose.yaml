@@ -1,0 +1,63 @@
+services:
+  login-e-commerce:
+    build: ./e-commerce-login-user
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - db-login
+    networks:
+      - ecommerce-network
+    volumes:
+      - login_data:/var/lib/postgresql/data
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/Login-e-commerce
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+  db-login:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=login-e-commerce
+    networks:
+      - ecommerce-network
+
+  cart-e-commerce:
+    build: ./e-commerce-cart
+    ports:
+      - "8081:8081"
+    restart: always
+    depends_on:
+      - db-cart
+    networks:
+      - ecommerce-network
+    volumes:
+      - cart_data:/var/lib/postgresql/data
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/Cart-e-commerce
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+  db-cart:
+    image: postgres:latest
+    ports:
+      - "5433:5432"
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=cart-e-commerce
+    networks:
+      - ecommerce-network
+
+volumes:
+  login_data:
+  cart_data:
+
+networks:
+  ecommerce-network:
